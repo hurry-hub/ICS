@@ -174,7 +174,8 @@ NOTES:
  *   Rating: 1
  */
 int evenBits(void) {
-  return 2;
+  int x = 12;
+  return x | 0x55;
 }
 /* 
  * isEqual - return 1 if x == y, and 0 otherwise 
@@ -184,7 +185,10 @@ int evenBits(void) {
  *   Rating: 2
  */
 int isEqual(int x, int y) {
-  return 2;
+  /*
+   *将两个操作数进行异或操作后，若相等则会返回0，不同即为非0，此时再进行取反操作，即满足要求
+   */
+  return !(x ^ y);
 }
 /* 
  * byteSwap - swaps the nth byte and the mth byte
@@ -196,7 +200,19 @@ int isEqual(int x, int y) {
  *  Rating: 2
  */
 int byteSwap(int x, int n, int m) {
-    return 2;
+    n = n << 3;
+    m = m << 3;
+    int num_n = x >> n;
+    int num_m = x >> m;
+    num_n = num_n & 0xFF;
+    num_m = num_m & 0xFF;
+    x = x & ~(0xFF << m | 0xFF << n);
+    num_n = num_n << m;
+    num_m = num_m << n;
+    x = x | num_n;
+    x = x | num_m;
+
+    return x;
 }
 /* 
  * rotateRight - Rotate x to the right by n
