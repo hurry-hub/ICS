@@ -242,7 +242,7 @@ int logicalNeg(int x) {
  *   Rating: 1
  */
 int tmax(void) {
-  return 2;
+  return 0x7FFFFFFFH;
 }
 /* 
  * sign - return 1 if positive, 0 if zero, and -1 if negative
