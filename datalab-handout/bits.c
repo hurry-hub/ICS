@@ -174,8 +174,7 @@ NOTES:
  *   Rating: 1
  */
 int evenBits(void) {
-  int x = 12;
-  return x | 0x55;
+  return 0x55555555;
 }
 /* 
  * isEqual - return 1 if x == y, and 0 otherwise 
