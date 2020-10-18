@@ -174,8 +174,7 @@ NOTES:
  *   Rating: 1
  */
 int evenBits(void) {
-  int x = 12;
-  return x | 0x55;
+  return 0x55555555;
 }
 /* 
  * isEqual - return 1 if x == y, and 0 otherwise 
@@ -243,7 +242,7 @@ int logicalNeg(int x) {
  *   Rating: 1
  */
 int tmax(void) {
-  return 2;
+  return 0x7FFFFFFFH;
 }
 /* 
  * sign - return 1 if positive, 0 if zero, and -1 if negative
