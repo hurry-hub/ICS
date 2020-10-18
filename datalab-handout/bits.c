@@ -174,7 +174,10 @@ NOTES:
  *   Rating: 1
  */
 int evenBits(void) {
-  return 0x55555555;
+    /*
+     *Assigning the even number is to return 0x55555555
+     */
+    return 0x55555555;
 }
 /* 
  * isEqual - return 1 if x == y, and 0 otherwise 
@@ -199,10 +202,15 @@ int isEqual(int x, int y) {
  *  Rating: 2
  */
 int byteSwap(int x, int n, int m) {
+    /*
+     *The n-bytes and m-bytes to be swapped are moved to th last bit,and then
+     *the original position is set to 0, and then two positions are swapped
+     *and added to the original number.
+     */
+    int num_m = x >> (m << 3);
+    int num_n = x >> (n << 3); 
     n = n << 3;
     m = m << 3;
-    int num_n = x >> n;
-    int num_m = x >> m;
     num_n = num_n & 0xFF;
     num_m = num_m & 0xFF;
     x = x & ~(0xFF << m | 0xFF << n);
@@ -222,7 +230,16 @@ int byteSwap(int x, int n, int m) {
  *   Rating: 3 
  */
 int rotateRight(int x, int n) {
-  return 2;
+    /*
+     *move the highest bit to the right n bit,then the lowest n bit to
+     *the left,the highest n bit after the right shift to zero,plus the
+     *n bit after the left shift
+     */
+    int high = x >> n;
+    int low = x <<(33 + ~n);
+    x = high & 0x7FFFFFFF >> (n + ~1 + 1);
+    x = x | low;
+    return x; 
 }
 /* 
  * logicalNeg - implement the ! operator, using all of 
@@ -233,7 +250,7 @@ int rotateRight(int x, int n) {
  *   Rating: 4 
  */
 int logicalNeg(int x) {
-  return 2;
+     return ((~(~x + 1) & ~x) >> 31 ) & 1;
 }
 /* 
  * TMax - return maximum two's complement integer 
@@ -242,7 +259,10 @@ int logicalNeg(int x) {
  *   Rating: 1
  */
 int tmax(void) {
-  return 0x7FFFFFFFH;
+    /*
+     *return the maxnum is to return 0x7FFFFFFF.
+     */
+    return 0x7FFFFFFF;
 }
 /* 
  * sign - return 1 if positive, 0 if zero, and -1 if negative
