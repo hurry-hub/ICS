@@ -279,7 +279,12 @@ int tmax(void) {
  *  Rating: 2
  */
 int sign(int x) {
-    return 2;
+    /*
+     *take the original number twice to determine whether it is 0,move the
+     *original number to the right 31 bits to obtain its symbol bit,find
+     *both and you can get the result.
+     */
+    return (x >> 31) | !!x;
 }
 /* 
  * isGreater - if x > y  then return 1, else return 0 
@@ -289,7 +294,16 @@ int sign(int x) {
  *   Rating: 3
  */
 int isGreater(int x, int y) {
-  return 2;
+    /*
+     *add the last number to the first number and take the reverse number to
+     *get the last number minus the first number,then let the last number and 
+     *the previous number take the reverse and then take the xor and the last
+     *number and the previous number take the reverse and then cross to judge
+     *whether the two are the same, the three first cross to find or take the
+     *sign after the last intersection with 1 to get the answer.
+     */
+    int x_neg = ~x;
+    return ((((y + x_neg + 1) & (y ^ x_neg)) | (y & x_neg)) >> 31) & 1;
 }
 /* 
  * subOK - Determine if can compute x-y without overflow
