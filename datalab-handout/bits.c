@@ -370,8 +370,15 @@ int howManyBits(int x) {
  *   Rating: 4
  */
 int ilog2(int x) {
-  return 2;
+    int ret = 0;
+    ret = (!!(x >> 16)) << 4;
+    ret = ret + ((!!(x >> (ret + 8))) << 3);
+    ret = ret + ((!!(x >> (ret + 4))) << 2);
+    ret = ret + ((!!(x >> (ret + 2))) << 1);
+    ret = ret + (!!(x >> (ret + 1)));
+    return ret;
 }
+
 /* 
  * float_half - Return bit-level equivalent of expression 0.5*f for
  *   floating point argument f.
@@ -384,7 +391,28 @@ int ilog2(int x) {
  *   Rating: 4
  */
 unsigned float_half(unsigned uf) {
-  return 2;
+    int round, S, E, maskE, maskM, maskS, maskEM, maskSM, tmp;
+    round = !((uf & 3) ^ 3);
+    maskS = 0x80000000;
+    maskE = 0x7F800000;
+    maskM = 0x007FFFFF;
+    maskEM= 0x7FFFFFFF;
+    maskSM= 0x807FFFFF;
+    E = uf & maskE;
+    S = uf & maskS;
+
+    if (E >= 0x7F800000) return uf; 
+
+    if (E == 0x00800000) {
+        return S | (round + ((uf & maskEM)>>1));
+    }
+  
+    if (E == 0x00000000) { 
+        tmp = (uf & maskM)>>1;
+        return S | (tmp + round);
+    }
+
+    return (((E>>23)-1)<<23) | (uf & maskSM);
 }
 /* 
  * float_f2i - Return bit-level equivalent of expression (int) f
@@ -399,7 +427,26 @@ unsigned float_half(unsigned uf) {
  *   Rating: 4
  */
 int float_f2i(unsigned uf) {
-  return 2;
+    int s = uf >> 31;
+    int exp = (uf >> 23) & 0xff;
+    int frac = uf & 0x007fffff;
+    int abs;
+    if (exp < 0x7f) {
+	return 0;
+    } else if (exp > 157) {
+	return 0x80000000;
+    } else {
+	if (exp - 150 > 0) {
+	    abs = (0x00800000 + frac) << (exp - 150);
+	} else {
+	    abs = (0x00800000 + frac) >> (150 - exp);
+	}
+   	if (s) {
+	    return -abs;
+	} else {
+	    return abs;
+	}
+    }
 }
 /* 
  * float_twice - Return bit-level equivalent of expression 2*f for
@@ -413,5 +460,26 @@ int float_f2i(unsigned uf) {
  *   Rating: 4
  */
 unsigned float_twice(unsigned uf) {
-  return 2;
+    int exp = 0x7f800000 & uf;
+    int num = 0x007FFFFF & uf;
+    unsigned flag = 0x80000000 & uf;
+    int n = (exp >> 23) - 127;
+    if (uf == 0x0) 
+	return 0;
+    if (n == 128) 
+	return uf;
+    if (exp == 0) {
+	if (uf & 0x00400000) {
+	    num = num << 1;
+	    exp = 0x00800000;
+	} 
+	else 
+	    num = num << 1;
+    } else {
+	exp = exp + 0x00800000;
+	n = (exp >> 23) - 127;
+	if (n == 128)
+	    num = 0;
+    }
+    return (exp | num | flag);
 }
