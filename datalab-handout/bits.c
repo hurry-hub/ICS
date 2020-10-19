@@ -250,7 +250,13 @@ int rotateRight(int x, int n) {
  *   Rating: 4 
  */
 int logicalNeg(int x) {
-     return ((~(~x + 1) & ~x) >> 31 ) & 1;
+    /*
+     *take the original number inversely plus one inverse number,and then take
+     *the reverse number inversely,if the original number is not zero,the 
+     *result is 0,the reverse is 1,and finally with 1,can ensure that operation
+     *of negative number is feasible.
+     */
+    return ((~(~x + 1) & ~x) >> 31 ) & 1;
 }
 /* 
  * TMax - return maximum two's complement integer 
@@ -294,7 +300,12 @@ int isGreater(int x, int y) {
  *   Rating: 3
  */
 int subOK(int x, int y) {
-  return 2;
+    int diff = x + ~y + 1;
+    int x_neg = x >> 31;
+    int y_neg = y >> 31;
+    int d_neg = diff >> 31;
+
+    return !(~(x_neg ^ ~y_neg) & (x_neg ^ d_neg));
 }
 /*
  * satAdd - adds two numbers but when positive overflow occurs, returns
