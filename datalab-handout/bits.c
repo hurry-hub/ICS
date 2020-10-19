@@ -349,7 +349,18 @@ int satAdd(int x, int y) {
  *  Rating: 4
  */
 int howManyBits(int x) {
-  return 0;
+    int shiftSign = x >> 31;
+    int operations = shiftSign ^ x;      
+    int negateOps = !operations;
+    int oppSign =  (!(!operations) << 31) >> 31;
+    int shift16 = !(!(operations >> 16)) << 4;
+    int shift8 = !(!(operations >> shift16 >> 8)) << 3;
+    int shift4 = !(!(operations >> shift16 >> shift8 >> 4)) << 2;
+    int shift2 = !(!(operations >> shift16 >> shift8 >> shift4 >> 2)) << 1;
+    int shift1= !(!(operations >> shift16 >> shift8 >> shift4 >> shift2 >> 1));
+    operations = shift16 + shift8 + shift4 + shift2 + shift1;
+    operations += 2;   
+    return (negateOps | (operations & oppSign));
 }
 /*
  * ilog2 - return floor(log base 2 of x), where x > 0
