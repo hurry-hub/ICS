@@ -332,7 +332,9 @@ int subOK(int x, int y) {
  *   Rating: 4
  */
 int satAdd(int x, int y) {
-  return 2;
+    int ans = x + y;
+    int over = ((x ^ ans) & (y ^ ans)) >> 31;
+    return (ans >> ( over & 31)) + (over << 31);
 }
 /* howManyBits - return the minimum number of bits required to represent x in
  *             two's complement
