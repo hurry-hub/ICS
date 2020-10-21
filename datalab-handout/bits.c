@@ -178,12 +178,11 @@ int evenBits(void) {
      *Assigning the even number is to return 0x55555555
      */
     int x = 0x55;
-    int res = 0;
-    res |= x;
-    res |= x << 8;
-    res |= x << 16;
-    res |= x << 24;
-    return res;
+    int res = x << 8;
+    x = x | res;
+    res = x << 16;
+    x = x | res;
+    return x;
   }
 /*
  * isEqual - return 1 if x == y, and 0 otherwise 
@@ -262,7 +261,7 @@ int logicalNeg(int x) {
      *result is 0,the reverse is 1,and finally with 1,can ensure that operation
      *of negative number is feasible.
      */
-    return ((~(~x + 1) & ~x) >> 31 ) & 1;
+    return (((~x + 1) | x) >> 31 & 1) ^ 1;
 }
 /* 
  * TMax - return maximum two's complement integer 
@@ -356,18 +355,22 @@ int satAdd(int x, int y) {
  *  Rating: 4
  */
 int howManyBits(int x) {
-    int shiftSign = x >> 31;
-    int operations = shiftSign ^ x;      
-    int negateOps = !operations;
-    int oppSign =  (!(!operations) << 31) >> 31;
-    int shift16 = !(!(operations >> 16)) << 4;
-    int shift8 = !(!(operations >> shift16 >> 8)) << 3;
-    int shift4 = !(!(operations >> shift16 >> shift8 >> 4)) << 2;
-    int shift2 = !(!(operations >> shift16 >> shift8 >> shift4 >> 2)) << 1;
-    int shift1= !(!(operations >> shift16 >> shift8 >> shift4 >> shift2 >> 1));
-    operations = shift16 + shift8 + shift4 + shift2 + shift1;
-    operations += 2;   
-    return (negateOps | (operations & oppSign));
+    int b16, b8, b4, b2, b1, b0;
+    int sign = x >> 31;
+    x = sign & (~x) | (~sign) & x;
+    b16 = !!(x >> 16) << 4;//判断前16位是否有1
+    x = x >> b16;//有1就移动16位，否则b16=0,不移动
+    b8 = !!(x >> 8) << 3;
+    x = x >> b8;
+    b4 = !!(x >> 4) << 2;
+    x = x >> b4;
+    b2 = !!(x >> 2) << 1;
+    x = x >> b2;
+    b1 = !!(x >> 1);
+    x = x >> b1;
+    b0 = x;
+
+    return b16 + b8 + b4 + b2 + b1 + b0 + 1;
 }
 /*
  * ilog2 - return floor(log base 2 of x), where x > 0
