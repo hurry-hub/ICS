@@ -177,9 +177,15 @@ int evenBits(void) {
     /*
      *Assigning the even number is to return 0x55555555
      */
-    return 0x55555555;
-}
-/* 
+    int x = 0x55;
+    int res = 0;
+    res |= x;
+    res |= x << 8;
+    res |= x << 16;
+    res |= x << 24;
+    return res;
+  }
+/*
  * isEqual - return 1 if x == y, and 0 otherwise 
  *   Examples: isEqual(5,5) = 1, isEqual(4,5) = 0
  *   Legal ops: ! ~ & ^ | + << >>
@@ -235,10 +241,10 @@ int rotateRight(int x, int n) {
      *the left,the highest n bit after the right shift to zero,plus the
      *n bit after the left shift
      */
-    int high = x >> n;
-    int low = x <<(33 + ~n);
-    x = high & 0x7FFFFFFF >> (n + ~1 + 1);
-    x = x | low;
+    //int high = x >> n;
+    //int l = x <<(33 + ~n);
+    x = ((x >> n) & (~(1 << 31) >> (n + ~1 + 1))) | x << (33 + ~n);
+    //x = x | l;
     return x; 
 }
 /* 
@@ -268,7 +274,8 @@ int tmax(void) {
     /*
      *return the maxnum is to return 0x7FFFFFFF.
      */
-    return 0x7FFFFFFF;
+    int x = ~(1 << 31);
+    return x;
 }
 /* 
  * sign - return 1 if positive, 0 if zero, and -1 if negative
