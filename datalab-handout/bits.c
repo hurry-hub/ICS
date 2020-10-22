@@ -486,26 +486,12 @@ int float_f2i(unsigned uf) {
  *   Rating: 4
  */
 unsigned float_twice(unsigned uf) {
-    int exp = 0x7f800000 & uf;
-    int num = 0x007FFFFF & uf;
-    unsigned flag = 0x80000000 & uf;
-    int n = (exp >> 23) - 127;
-    if (uf == 0x0) 
-	return 0;
-    if (n == 128) 
-	return uf;
-    if (exp == 0) {
-	if (uf & 0x00400000) {
-	    num = num << 1;
-	    exp = 0x00800000;
-	} 
-	else 
-	    num = num << 1;
-    } else {
-	exp = exp + 0x00800000;
-	n = (exp >> 23) - 127;
-	if (n == 128)
-	    num = 0;
+    unsigned f = uf;
+    if ((f & 0x7f800000) == 0) {
+	f = ((f & 0x007fffff) << 1) | (0x80000000 & f);	
+    } else if ((f & 0x7f800000) != 0x7f800000) {
+	f = f + 0x00800000;
     }
-    return (exp | num | flag);
+
+    return f;
 }
