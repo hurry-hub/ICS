@@ -453,6 +453,13 @@ unsigned float_half(unsigned uf) {
  *   Rating: 4
  */
 int float_f2i(unsigned uf) {
+    /*Returns 0 if the original floating-point value is 0, 0 if the true index is greater than 31 (the frac portion is greater than or equal to 1,
+    *1<<31 bits overwrite the sign bit), returns the specified overflow value of 0x8000000u, and returns 0 if the formula (1 right shift x bit, x>0,
+    *result is 0). The rest: first convert the small part (23 bits) into an integer (compared to 23) and then determine whether to overflow:
+    *if the original symbol is the same, return directly, otherwise if the result is negative (originally positive), 
+    *the overflow returns the cross-border specified value of 0x8000000u, otherwise the original negative, the result is positive,
+    *you need to return its complement (the opposite number).
+    */
     int s = uf >> 31;
     int exp = (uf >> 23) & 0xff;
     int frac = uf & 0x007fffff;
@@ -488,7 +495,7 @@ int float_f2i(unsigned uf) {
 unsigned float_twice(unsigned uf) {
     unsigned f = uf;
     if ((f & 0x7f800000) == 0) {
-	f = ((f & 0x007fffff) << 1) | (0x80000000 & f);	
+	f = ((f & 0x007fffff) << 1) | (0x80000000 & f);	//Move one bit to the left.
     } else if ((f & 0x7f800000) != 0x7f800000) {
 	f = f + 0x00800000;
     }
