@@ -175,7 +175,8 @@ NOTES:
  */
 int evenBits(void) {
     /*
-     *Assigning the even number is to return 0x55555555
+     *Shift 0x55 to the left by 8 bits, and then add the original number or to get 0x5555.
+     *Then shift 0x5555 to the left by 16 bits and sum the original number or to get 0x5555555.
      */
     int x = 0x55;
     int res = x << 8;
@@ -193,7 +194,8 @@ int evenBits(void) {
  */
 int isEqual(int x, int y) {
   /*
-   *将两个操作数进行异或操作后，若相等则会返回0，不同即为非0，此时再进行取反操作，即满足要求
+   *If the two operands are XOR, they will return 0 if they are equal. If they are different, they will be non-0.
+   *In this case, reverse operation is performed to meet the requirements
    */
   return !(x ^ y);
 }
@@ -240,10 +242,7 @@ int rotateRight(int x, int n) {
      *the left,the highest n bit after the right shift to zero,plus the
      *n bit after the left shift
      */
-    //int high = x >> n;
-    //int l = x <<(33 + ~n);
     x = ((x >> n) & (~(1 << 31) >> (n + ~1 + 1))) | x << (33 + ~n);
-    //x = x | l;
     return x; 
 }
 /* 
@@ -271,7 +270,7 @@ int logicalNeg(int x) {
  */
 int tmax(void) {
     /*
-     *return the maxnum is to return 0x7FFFFFFF.
+     *Shift 1 to the left by 31 bits, and then take the reverse to get the 0x7fffffff.
      */
     int x = ~(1 << 31);
     return x;
@@ -324,7 +323,9 @@ int subOK(int x, int y) {
     int x_neg = x >> 31;
     int y_neg = y >> 31;
     int d_neg = diff >> 31;
-
+	/*
+	*Overflow when x and y have opposite sign, and d different from x 
+	*/
     return !(~(x_neg ^ ~y_neg) & (x_neg ^ d_neg));
 }
 /*
@@ -340,7 +341,13 @@ int subOK(int x, int y) {
 int satAdd(int x, int y) {
     int ans = x + y;
     int over = ((x ^ ans) & (y ^ ans)) >> 31;
+	//There are two kinds of results: overflow is 0xFFFFFFFF, non overflow is 0
     return (ans >> ( over & 31)) + (over << 31);
+	/*
+	*positive overflow, 0xFFFFFFFF + 1 = 0x7FFFFFFF
+	*negative overflow,0 + 0x80000000
+	*non overflow, ans >> 31 + 0 << 31
+	*/
 }
 /* howManyBits - return the minimum number of bits required to represent x in
  *             two's complement
@@ -358,9 +365,12 @@ int howManyBits(int x) {
     int b16, b8, b4, b2, b1, b0;
     int sign = x >> 31;
     x = sign & (~x) | (~sign) & x;
-    b16 = !!(x >> 16) << 4;//判断前16位是否有1
-    x = x >> b16;//有1就移动16位，否则b16=0,不移动
-    b8 = !!(x >> 8) << 3;
+	//If x is positive, it does not change, otherwise it is reversed by bit.
+    b16 = !!(x >> 16) << 4;
+	//judge whether there is 1 in the first 16 bits
+    x = x >> b16;
+	//If there is 1, move 16 bits, otherwise B16 = 0, do not move
+    b8 = !!(x >> 8) << 3;//Similarly.
     x = x >> b8;
     b4 = !!(x >> 4) << 2;
     x = x >> b4;
@@ -371,6 +381,7 @@ int howManyBits(int x) {
     b0 = x;
 
     return b16 + b8 + b4 + b2 + b1 + b0 + 1;
+	//plus 1 means add a symbol bit.
 }
 /*
  * ilog2 - return floor(log base 2 of x), where x > 0
@@ -380,6 +391,11 @@ int howManyBits(int x) {
  *   Rating: 4
  */
 int ilog2(int x) {
+	/*
+	*The two-way method. Move 16 bits to the right and get more than 0.
+	*Otherwise get 0, determine whether the highest bit is 0, and if not 0, it contains 16 squares of 2.
+	*That is, to get the highest bit of the log number, the same as the other.
+	*/
     int ret = 0;
     ret = (!!(x >> 16)) << 4;
     ret = ret + ((!!(x >> (ret + 8))) << 3);
@@ -414,15 +430,15 @@ unsigned float_half(unsigned uf) {
     if (E >= 0x7F800000) return uf; 
 
     if (E == 0x00800000) {
-        return S | (round + ((uf & maskEM)>>1));
+        return S | (round + ((uf & maskEM) >> 1));
     }
   
     if (E == 0x00000000) { 
-        tmp = (uf & maskM)>>1;
+        tmp = (uf & maskM) >> 1;
         return S | (tmp + round);
     }
 
-    return (((E>>23)-1)<<23) | (uf & maskSM);
+    return (((E >> 23) - 1) << 23) | (uf & maskSM);
 }
 /* 
  * float_f2i - Return bit-level equivalent of expression (int) f
