@@ -417,28 +417,21 @@ int ilog2(int x) {
  *   Rating: 4
  */
 unsigned float_half(unsigned uf) {
-    int round, S, E, maskE, maskM, maskS, maskEM, maskSM, tmp;
-    round = !((uf & 3) ^ 3);
-    maskS = 0x80000000;
-    maskE = 0x7F800000;
-    maskM = 0x007FFFFF;
-    maskEM= 0x7FFFFFFF;
-    maskSM= 0x807FFFFF;
-    E = uf & maskE;
-    S = uf & maskS;
-
-    if (E >= 0x7F800000) return uf; 
-
-    if (E == 0x00800000) {
-        return S | (round + ((uf & maskEM) >> 1));
-    }
-  
-    if (E == 0x00000000) { 
-        tmp = (uf & maskM) >> 1;
-        return S | (tmp + round);
-    }
-
-    return (((E >> 23) - 1) << 23) | (uf & maskSM);
+    unsigned sign = uf & 0x80000000;
+  unsigned exp = uf & 0x7f800000;
+  unsigned lsb = ((uf & 3) == 3); // 3 = [11]2
+  if (exp == 0x7f800000) // infinity or NaN
+  {
+    return uf;
+  }
+  else if (exp <= 0x00800000) // denormalized number
+  {
+    return sign | (((uf ^ sign) + lsb) >> 1);
+  }
+  else
+  {
+    return uf - 0x00800000; // exp - 1
+  }
 }
 /* 
  * float_f2i - Return bit-level equivalent of expression (int) f
