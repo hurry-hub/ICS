@@ -1,0 +1,10 @@
+
+c2.o:     file format elf64-x86-64
+
+
+Disassembly of section .text:
+
+0000000000000000 <.text>:
+   0:	48 c7 c7 88 a6 66 58 	mov    $0x5866a688,%rdi
+   7:	68 71 18 40 00       	pushq  $0x401871
+   c:	c3                   	retq   
